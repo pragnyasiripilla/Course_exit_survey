@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Courses</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('Lendilogo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            font-family: 'Montserrat', Arial, sans-serif;
+            color: white;
+            position: relative;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 0;
+        }
+
+        .form-box {
+            position: relative;
+            z-index: 1;
+            margin: 60px auto 0 auto;
+            width: 370px;
+            padding: 32px 28px 24px 28px;
+            background: rgba(30, 30, 40, 0.97);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+
+        .form-box:hover {
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            margin-bottom: 24px;
+            font-size: 1.7rem;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 8px #000;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            background: #222;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            background: #333;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #00c6ff 60%, #007bff 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .co-section {
+            margin: 20px 0;
+            padding: 18px 10px 10px 10px;
+            background: #444a;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .co-section h4 {
+            margin-bottom: 10px;
+            color: #00c6ff;
+            font-size: 1.1rem;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        #successMsg {
+            display: none;
+            color: #4caf50;
+            text-align: center;
+            font-size: 20px;
+            margin-top: 30px;
+            font-weight: bold;
+            text-shadow: 1px 1px 6px #000;
+        }
+
+        @media (max-width: 500px) {
+            .form-box {
+                width: 95vw;
+                padding: 18px 4vw 14px 4vw;
+            }
+
+            h2 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div class="form-box" id="mainForm">
+        <h2>Add Course</h2>
+        <form id="courseForm">
+            <input type="text" id="branch" placeholder="Branch Name" required />
+            <input type="number" id="year" placeholder="Year" min="1" max="4" required />
+            <input type="number" id="semester" placeholder="Semester" min="1" max="8" required />
+            <input type="number" id="subjects" placeholder="No. of Subjects" min="1" required />
+            <button type="submit">Next</button>
+        </form>
+    </div>
+    <div class="form-box" id="coForm" style="display:none;">
+        <h2>Enter Course Outcomes</h2>
+        <form id="outcomesForm"></form>
+    </div>
+    <div id="successMsg">
+        You have successfully added your course outcomes!
+    </div>
+    <script>
+        let courseData = {};
+        document.getElementById('courseForm').onsubmit = function (e) {
+            e.preventDefault();
+            courseData = {
+                branch: document.getElementById('branch').value,
+                year: Number(document.getElementById('year').value),
+                semester: Number(document.getElementById('semester').value),
+                subjects: Number(document.getElementById('subjects').value),
+                subjectNames: [],
+                outcomes: []
+            };
+            showCOForm(courseData.subjects);
+        };
+
+        function showCOForm(numSubjects) {
+            numSubjects = parseInt(numSubjects); // Ensure it's a number
+            document.getElementById('mainForm').style.display = 'none';
+            const form = document.getElementById('outcomesForm');
+            form.innerHTML = '';
+            for (let i = 1; i <= numSubjects; i++) {
+                let section = document.createElement('div');
+                section.className = 'co-section';
+                section.innerHTML = `<h4>Subject ${i}</h4>
+                    <label>Subject Name: <input type="text" name="subjectName_${i}" required></label>
+                    <label>CO1: <input type="text" name="co${i}_1" required></label>
+                    <label>CO2: <input type="text" name="co${i}_2" required></label>
+                    <label>CO3: <input type="text" name="co${i}_3" required></label>
+                    <label>CO4: <input type="text" name="co${i}_4" required></label>
+                    <label>CO5: <input type="text" name="co${i}_5" required></label>`;
+                form.appendChild(section);
+            }
+            let submitBtn = document.createElement('button');
+            submitBtn.type = 'submit';
+            submitBtn.textContent = 'Submit';
+            form.appendChild(submitBtn);
+            document.getElementById('coForm').style.display = 'block';
+
+            // Attach the submit handler here
+            form.onsubmit = async function (e) {
+                e.preventDefault();
+                courseData.subjectNames = [];
+                courseData.outcomes = [];
+                for (let i = 1; i <= numSubjects; i++) {
+                    const subjName = document.querySelector(`[name="subjectName_${i}"]`).value.trim();
+                    courseData.subjectNames.push(subjName);
+                    let subjectCOs = [];
+                    for (let j = 1; j <= 5; j++) {
+                        subjectCOs.push(document.querySelector(`[name="co${i}_${j}"]`).value);
+                    }
+                    courseData.outcomes.push(subjectCOs);
+                }
+                // Send to backend
+                const res = await fetch('http://localhost:3000/api/courses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(courseData)
+                });
+                if (res.ok) {
+                    window.location.href = 'thankyou_course.html';
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>

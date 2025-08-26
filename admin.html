@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login & Feedback Form Creation</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('Lendilogo.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: white;
+      position: relative;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 0;
+    }
+
+    .center-content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-box,
+    .container {
+      background: rgba(30, 30, 40, 0.97);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      padding: 32px 32px 24px 32px;
+      text-align: center;
+      width: 340px;
+      margin: 24px auto;
+      transition: box-shadow 0.2s;
+    }
+
+    .login-box:hover,
+    .container:hover {
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+    }
+
+    h2 {
+      margin-bottom: 24px;
+      font-size: 1.7rem;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 8px #000;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      background: #222;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      outline: none;
+      transition: background 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      background: #333;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #00c6ff 60%, #007bff 100%);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    #error {
+      color: #ff5252;
+      margin-top: 8px;
+      font-size: 1rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .container input[type="text"] {
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 500px) {
+
+      .login-box,
+      .container {
+        width: 95vw;
+        padding: 18px 4vw 14px 4vw;
+      }
+
+      h2 {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay"></div>
+  <div class="center-content">
+    <div class="login-box" id="loginBox">
+      <h2>Admin Login</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <p id="error"></p>
+    </div>
+    <div class="container hidden" id="feedbackFormCreation">
+      <h2>Create Feedback Form</h2>
+      <input type="text" id="subject" placeholder="Enter Subject Name"><br>
+      <input type="text" class="co-input" id="co1" placeholder="Enter CO1"><br>
+      <input type="text" class="co-input" id="co2" placeholder="Enter CO2"><br>
+      <input type="text" class="co-input" id="co3" placeholder="Enter CO3"><br>
+      <input type="text" class="co-input" id="co4" placeholder="Enter CO4"><br>
+      <input type="text" class="co-input" id="co5" placeholder="Enter CO5"><br>
+      <button onclick="saveCOs()">Save Feedback Form</button>
+    </div>
+  </div>
+  <script>
+    function login() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (user === "admin" && pass === "admin123") {
+        window.location.href = "admin_dashboard.html";
+      } else {
+        document.getElementById('error').innerText = "Invalid credentials!";
+      }
+    }
+    // Optionally, you can add JS to show the feedback form after login if needed
+    function saveCOs() {
+      alert("Feedback form saved! (Implement backend logic as needed)");
+    }
+  </script>
+</body>
+
+</html>

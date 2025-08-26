@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Course-Exit Survey</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('Lendilogo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            font-family: 'Montserrat', Arial, sans-serif;
+            color: white;
+            position: relative;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            object-fit: cover;
+            background: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 8px #000;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .links a {
+            display: inline-block;
+            margin: 20px 20px 0 20px;
+            padding: 18px 40px;
+            background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            position: relative;
+        }
+
+        .links a img {
+            vertical-align: middle;
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
+            border-radius: 50%;
+            background: #fff;
+            padding: 3px;
+        }
+
+        .links a:hover {
+            background: linear-gradient(90deg, #00c6ff 60%, #007bff 100%);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .links a {
+                padding: 12px 18px;
+                font-size: 1rem;
+                margin: 15px 5px 0 5px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div class="content">
+        <!-- If you have a logo, use it here -->
+        <!-- <img src="Lendilogo.jpg" alt="Logo" class="logo"> -->
+        <h1>LENDI INSTITUTE OF ENGINEERING AND TECHNOLOGY</h1>
+        <h1>COURSE EXIT SURVEY</h1>
+        <div class="links">
+            <a href="admin.html">
+                <img src="admin_icon.png" alt="Admin">
+                Admin Login
+            </a>
+            <a href="student.html">
+                <img src="student_icon.png" alt="Student">
+                Student Login
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

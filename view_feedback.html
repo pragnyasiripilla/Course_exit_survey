@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Student Feedback</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { margin:0; padding:0; background-image:url('Lendilogo.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat; min-height:100vh; font-family:'Montserrat', Arial, sans-serif; color:white; position:relative; }
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:0; }
+    .content { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; gap:18px; padding:30px 12px; }
+    .card { width:95%; max-width:1000px; background:rgba(30,30,40,0.97); border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.4); padding:18px; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; }
+    input, select, button { padding:10px; border-radius:8px; border:none; }
+    button { background:linear-gradient(90deg,#007bff 60%,#00c6ff 100%); color:#fff; cursor:pointer; font-weight:bold; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; }
+    th, td { border-bottom:1px solid #555; padding:8px; text-align:left; }
+    .charts { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:16px; }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="content">
+    <div class="card">
+      <div class="row">
+        <input id="branch" placeholder="Branch" />
+        <input id="year" placeholder="Year" type="number" min="1" max="4" />
+        <input id="semester" placeholder="Semester" type="number" min="1" max="8" />
+        <button id="load">Load Courses</button>
+        <select id="courseSelect"></select>
+        <button id="export">Export CSV</button>
+      </div>
+      <div id="meta" style="margin-top:10px;"></div>
+      <div id="tableWrap"></div>
+      <div class="charts" id="charts"></div>
+    </div>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let currentSummary = null;
+    let currentCourse = null;
+
+    async function loadCourses() {
+      const params = new URLSearchParams();
+      const b = $('branch').value.trim();
+      const y = $('year').value.trim();
+      const s = $('semester').value.trim();
+      if (b) params.append('branch', b);
+      if (y) params.append('year', y);
+      if (s) params.append('semester', s);
+      const res = await fetch(`http://localhost:3000/api/courses?${params.toString()}`);
+      const courses = await res.json();
+      const sel = $('courseSelect');
+      sel.innerHTML = '';
+      courses.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c._id;
+        opt.textContent = `${c.branch} - Year ${c.year} - Sem ${c.semester}`;
+        sel.appendChild(opt);
+      });
+      if (courses.length) {
+        await loadSummary(courses[0]._id);
+      } else {
+        $('meta').innerHTML = 'No courses found.';
+        $('tableWrap').innerHTML = '';
+        $('charts').innerHTML = '';
+      }
+    }
+
+    async function loadSummary(courseId) {
+      const res = await fetch(`http://localhost:3000/api/feedback/summary?courseId=${courseId}`);
+      const data = await res.json();
+      currentSummary = data;
+      currentCourse = data.course;
+      renderSummary(data);
+    }
+
+    function renderSummary(data) {
+      const { course, totals, numResponses } = data;
+      $('meta').innerHTML = `${course.branch} - Year ${course.year} - Sem ${course.semester} | Responses: ${numResponses}`;
+      // Table
+      let html = '<table><thead><tr><th>Subject</th><th>CO</th><th>Excellent</th><th>Good</th><th>Average</th></tr></thead><tbody>';
+      (course.outcomes || []).forEach((subjectCOs, sIdx) => {
+        subjectCOs.forEach((coText, coIdx) => {
+          const counts = (totals[sIdx] && totals[sIdx][coIdx]) || { Excellent:0, Good:0, Average:0 };
+          const subjectTitle = (course.subjectNames && course.subjectNames[sIdx]) || `Subject ${sIdx+1}`;
+          html += `<tr><td>${subjectTitle}</td><td>CO${coIdx+1}: ${coText}</td><td>${counts.Excellent}</td><td>${counts.Good}</td><td>${counts.Average}</td></tr>`;
+        });
+      });
+      html += '</tbody></table>';
+      $('tableWrap').innerHTML = html;
+
+      // Charts
+      $('charts').innerHTML = '';
+      (course.outcomes || []).forEach((subjectCOs, sIdx) => {
+        const canvas = document.createElement('canvas');
+        $('charts').appendChild(canvas);
+        const labels = subjectCOs.map((_, i) => `CO${i+1}`);
+        const exc = subjectCOs.map((_, i) => totals[sIdx][i].Excellent);
+        const good = subjectCOs.map((_, i) => totals[sIdx][i].Good);
+        const avg = subjectCOs.map((_, i) => totals[sIdx][i].Average);
+        new Chart(canvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Excellent', data: exc, backgroundColor: 'rgba(0,200,83,0.7)' },
+              { label: 'Good', data: good, backgroundColor: 'rgba(33,150,243,0.7)' },
+              { label: 'Average', data: avg, backgroundColor: 'rgba(255,193,7,0.8)' }
+            ]
+          },
+          options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { x: { ticks: { color:'#fff' } }, y: { ticks: { color:'#fff' } } } }
+        });
+      });
+    }
+
+    function exportCSV() {
+      if (!currentSummary) return;
+      const { course, totals } = currentSummary;
+      // Use 3,2,1 format where 3=Excellent, 2=Good, 1=Average
+      let rows = [['Subject','CO','3','2','1']];
+      (course.outcomes || []).forEach((subjectCOs, sIdx) => {
+        subjectCOs.forEach((coText, coIdx) => {
+          const subjectTitle = (course.subjectNames && course.subjectNames[sIdx]) || `Subject ${sIdx+1}`;
+          const counts = (totals[sIdx] && totals[sIdx][coIdx]) || { Excellent:0, Good:0, Average:0 };
+          rows.push([subjectTitle, `CO${coIdx+1}: ${coText}`, counts.Excellent, counts.Good, counts.Average]);
+        });
+      });
+      const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'feedback_summary.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    $('load').addEventListener('click', loadCourses);
+    $('courseSelect').addEventListener('change', (e) => loadSummary(e.target.value));
+    $('export').addEventListener('click', exportCSV);
+
+    // initial
+    loadCourses();
+  </script>
+</body>
+</html>
+
